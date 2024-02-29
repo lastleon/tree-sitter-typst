@@ -30,6 +30,17 @@ module.exports = grammar({
     $.label_open,
     $.label_close,
 
+    // Raw
+    $.raw_single_open,
+    $.raw_single_close,
+    
+    $.raw_multiple_open,
+    $.raw_multiple_close,
+
+    $.raw_language_type,
+    $.raw_single_content,
+    $.raw_multiple_content,
+
     // Needed because heading starts are ambiguous
     $.heading_prefix,
     $.equalsigns,
@@ -67,7 +78,7 @@ module.exports = grammar({
     whitespace: $ => prec.right(repeat1(seq(/[ \t]/, optional($.last_token_non_word)))), // prec.right => match rule as long as possible
 
     word: $ => seq(WORD, optional($.last_token_word)),
-    special: $ => prec.right(repeat1(seq(choice(/[^\w \t\*=@<>\\]/, $.equalsigns), optional($.last_token_non_word)))), // \w contains underscore, so we do not need to list it seperately
+    special: $ => prec.right(repeat1(seq(choice(/[^\w \t\*=@<>\\`]/, $.equalsigns), optional($.last_token_non_word)))), // \w contains underscore, so we do not need to list it seperately
     star: $ => prec(PREC.STAR, seq("*", optional($.last_token_non_word))),
     underscore: $ => prec(PREC.UNDERSCORE, seq("_", optional($.last_token_non_word))),
     less_than: $ => prec(PREC.LESS_THAN, seq("<", optional($.last_token_non_word))),
@@ -103,6 +114,7 @@ module.exports = grammar({
       $.underscore,
       $.less_than,
       $.more_than,
+      $.raw,
       $.newline,
     )),
 
@@ -126,6 +138,7 @@ module.exports = grammar({
       $.underscore,
       $.less_than,
       $.more_than,
+      $.raw,
       $.newline,
     )),
 
@@ -161,6 +174,7 @@ module.exports = grammar({
       $.star,
       $.less_than,
       $.more_than,
+      $.raw,
       $.underscore,
     )),
 
@@ -186,26 +200,40 @@ module.exports = grammar({
         $.underscore,
         $.less_than,
         $.more_than,
+        $.raw,
     )),
 
     // LABEL
     label: $ => seq(
-      // seq($.label_open, optional($.last_token_non_word)),
       $.label_open,
       alias(REFERENCE_NAME_REGEX, $.label_content),
-      seq($.label_close, optional($.last_token_non_word)),
+      $.label_close,
+      optional($.last_token_non_word),
     ),
-
-    // label: $ => seq(
-    //   alias(token(prec.dynamic(100, "<")), $.label_open), // TODO:
-    //   alias(REFERENCE_NAME_REGEX, $.label_content),
-    //   seq(alias(">", $.label_close), optional($.last_token_non_word)),
-    // ),
 
     // REFERENCE
     reference: $ => seq("@", REFERENCE_NAME_REGEX, optional($.last_token_word)),
 
-    
+    // RAW BLOCK
+    raw: $ => seq(
+      choice(
+        seq(
+          $.raw_single_open,
+          optional($.raw_single_content),
+          $.raw_single_close,
+        ), 
+        seq(
+          $.raw_multiple_open,
+          $.raw_single_content, // TODO: Remove this and use the commented code. raw_language_type must also be an external symbol, because if one choice is external the scanner is always called, meaning we can't get higher precedence for raw_language_type if we keep the token in here. Also remember to consider all special cases of raw_multiple_content, such as backtick inside raw_multiple_content.
+          // choice(
+          //   seq($.raw_language_type, optional($.raw_multiple_content)),
+          //   $.raw_multiple_content,
+          // ),
+          $.raw_multiple_close,
+        ),
+      ),
+      optional($.last_token_non_word) // unsure if this is enough or $.last_token_word should be added
+    ),
 
     // COMMENT
     comment: $ => choice(

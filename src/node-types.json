@@ -101,6 +101,10 @@
           "named": true
         },
         {
+          "type": "raw",
+          "named": true
+        },
+        {
           "type": "reference",
           "named": true
         },
@@ -207,6 +211,10 @@
         },
         {
           "type": "newline",
+          "named": true
+        },
+        {
+          "type": "raw",
           "named": true
         },
         {
@@ -338,6 +346,10 @@
           "named": true
         },
         {
+          "type": "raw",
+          "named": true
+        },
+        {
           "type": "reference",
           "named": true
         },
@@ -443,6 +455,41 @@
       "types": [
         {
           "type": "last_token_non_word",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "raw",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "last_token_non_word",
+          "named": true
+        },
+        {
+          "type": "raw_multiple_close",
+          "named": true
+        },
+        {
+          "type": "raw_multiple_open",
+          "named": true
+        },
+        {
+          "type": "raw_single_close",
+          "named": true
+        },
+        {
+          "type": "raw_single_content",
+          "named": true
+        },
+        {
+          "type": "raw_single_open",
           "named": true
         }
       ]
@@ -558,6 +605,10 @@
         },
         {
           "type": "newline",
+          "named": true
+        },
+        {
+          "type": "raw",
           "named": true
         },
         {
@@ -721,6 +772,26 @@
   },
   {
     "type": "linebreak",
+    "named": true
+  },
+  {
+    "type": "raw_multiple_close",
+    "named": true
+  },
+  {
+    "type": "raw_multiple_open",
+    "named": true
+  },
+  {
+    "type": "raw_single_close",
+    "named": true
+  },
+  {
+    "type": "raw_single_content",
+    "named": true
+  },
+  {
+    "type": "raw_single_open",
     "named": true
   },
   {

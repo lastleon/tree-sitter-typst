@@ -1,7 +1,6 @@
 #include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <wchar.h>
 #include "tree_sitter/parser.h"
 
 typedef enum {
@@ -18,6 +17,16 @@ typedef enum {
   LABEL_OPEN,
   LABEL_CLOSE,
 
+  RAW_SINGLE_OPEN,
+  RAW_SINGLE_CLOSE,
+  
+  RAW_MULTIPLE_OPEN,
+  RAW_MULTIPLE_CLOSE,
+
+  RAW_LANGUAGE_TYPE,
+  RAW_SINGLE_CONTENT,
+  RAW_MULTIPLE_CONTENT,
+
   HEADING_PREFIX,
   EQUALSIGNS,
 
@@ -28,9 +37,10 @@ typedef enum {
   ERROR,
 } TokenType;
 
-// typedef struct {
-//   bool inside_strong;
-// } Scanner;
+typedef struct {
+  // uint32_t num_backticks_in_open_token;
+  char num_backticks_in_open_token;
+} Scanner;
 
 bool decide_heading_or_equalsigns(TSLexer *lexer, const bool *valid_symbols) {
   // At this point we already know that the next char is =, so no need to check
@@ -150,6 +160,110 @@ bool parse_label(TSLexer *lexer, const bool *valid_symbols) {
   return false;
 }
 
+bool parse_raw(TSLexer *lexer, const bool *valid_symbols, void *payload) {
+  // This check is probably not needed, as one of these symbols must be valid if (unescaped) backtick is encountered
+  const bool raw_valid = valid_symbols[RAW_SINGLE_OPEN] 
+                        || valid_symbols[RAW_SINGLE_CLOSE] 
+                        || valid_symbols[RAW_MULTIPLE_OPEN] 
+                        || valid_symbols[RAW_MULTIPLE_CLOSE];
+
+  if (!raw_valid) {
+    return false;
+  }
+
+  Scanner *s = (Scanner *)payload;
+
+  // Currently, we know there is one backtick
+
+  if (valid_symbols[RAW_SINGLE_OPEN] || valid_symbols[RAW_MULTIPLE_OPEN]) {
+    lexer->advance(lexer, false);
+
+    // EOF or 'no backtick': No more backticks, so it must be RAW_SINGLE_OPEN
+    if (lexer->eof(lexer) || lexer->lookahead != '`') {
+      lexer->result_symbol = RAW_SINGLE_OPEN;
+
+      return true;
+    }
+
+    // We know there are two backticks, so this could be both a single or multiple raw block open token
+    // Need to look ahead, but not consume
+    lexer->mark_end(lexer);
+    lexer->advance(lexer, false);
+
+    // EOF or 'no backtick': The two backticks were RAW_SINGLE_OPEN and RAW_SINGLE_CLOSE, 
+    // but currently we are parsing OPEN so this is what we return
+    if (lexer->eof(lexer) || lexer->lookahead != '`') {
+      lexer->result_symbol = RAW_SINGLE_OPEN;
+
+      return true;
+    }
+
+    // Now we know there are at least three backticks, so this is a RAW_MULTIPLE_OPEN token. We need to count and consume all backticks
+    char num_backticks = 2;
+    while (!lexer->eof(lexer) && lexer->lookahead == '`') {
+      num_backticks++;
+
+      lexer->advance(lexer, false);
+    }
+
+    lexer->mark_end(lexer);
+    s->num_backticks_in_open_token = num_backticks;
+
+    lexer->result_symbol = RAW_MULTIPLE_OPEN;
+    return true;
+  }
+
+  if (valid_symbols[RAW_SINGLE_CLOSE]) {
+    lexer->advance(lexer, false);
+
+    // EOF or 'no backtick': No more backticks, so it is RAW_SINGLE_CLOSE
+    if (lexer->eof(lexer) || lexer->lookahead != '`') {
+      lexer->result_symbol = RAW_SINGLE_CLOSE;
+
+      return true;
+    }
+
+    // If there are more backticks, this is an error.
+    return false;
+  }
+  
+
+  if (valid_symbols[RAW_MULTIPLE_CLOSE]) {
+    lexer->advance(lexer, false);
+
+    // There must be exactly as many backticks as saved in s->num_backticks_in_open_token
+    for (int num_backticks = 1; num_backticks < s->num_backticks_in_open_token; num_backticks++) {
+      if (lexer->eof(lexer) || lexer->lookahead != '`') {
+        return false;
+      }
+
+      lexer->advance(lexer, false);
+    }
+
+    // backtick: too many backticks
+    if (lexer->lookahead == '`') {
+      return false;
+    }
+
+    s->num_backticks_in_open_token = 0; // I think this is not needed, but better safe than sorry
+
+    lexer->result_symbol = RAW_MULTIPLE_CLOSE;
+    return true;
+  }
+  
+  printf("\033[1;31mSCANNER: REACHED IMPOSSIBLE STATE\033[0m\n");
+
+  return false;
+}
+
+bool parse_raw_single_content(TSLexer *lexer, const bool *valid_symbols) {
+  do {
+    lexer->advance(lexer, false);
+  } while (!lexer->eof(lexer) && lexer->lookahead != '`');
+
+  lexer->result_symbol = RAW_SINGLE_CONTENT;
+  return true;
+}
 
 bool parse_escape(TSLexer *lexer, const bool *valid_symbols) {
   // This check is probably not needed, but better safe than sorry
@@ -229,27 +343,25 @@ bool parse_escape(TSLexer *lexer, const bool *valid_symbols) {
 
 
 void * tree_sitter_typst_external_scanner_create() {
- //  Scanner *s = (Scanner *)malloc(sizeof(Scanner));
-	// return s;
-  return NULL;
+  Scanner *s = (Scanner *)malloc(sizeof(Scanner));
+	return s;
 }
 
 void tree_sitter_typst_external_scanner_destroy(void *payload) {
-  // Scanner *s = (Scanner *)payload;
-  // free(s);
+  Scanner *s = (Scanner *)payload;
+  free(s);
 }
 
 unsigned tree_sitter_typst_external_scanner_serialize(
   void *payload,
   char *buffer
 ) {
-  // Scanner *s = (Scanner *)payload;
-  // unsigned bytes_written = 0;
-  //
-  // buffer[bytes_written++] = (char)s->inside_strong;
-  //
-  // return bytes_written;
-  return 0;
+  Scanner *s = (Scanner *)payload;
+  unsigned bytes_written = 0;
+
+  buffer[bytes_written++] = (char)s->num_backticks_in_open_token; // TODO: idk??? is this correct?
+
+  return bytes_written;
 }
 
 void tree_sitter_typst_external_scanner_deserialize(
@@ -257,15 +369,15 @@ void tree_sitter_typst_external_scanner_deserialize(
   char *buffer,
   unsigned length
 ) {
-  // Scanner *s = (Scanner *)payload;
-  //
-  // // Erase state variables before deserialization (see docs)
-  // s->inside_strong = 0;
-  //
-  // // Deserialization
-  // if (length > 0) {
-  //   s->inside_strong = buffer[0];
-  // }
+  Scanner *s = (Scanner *)payload;
+
+  // Erase state variables before deserialization (see docs)
+  s->num_backticks_in_open_token = 0;
+
+  // Deserialization
+  if (length > 0) {
+    s->num_backticks_in_open_token = buffer[0];
+  }
 }
 
 bool tree_sitter_typst_external_scanner_scan(
@@ -273,21 +385,17 @@ bool tree_sitter_typst_external_scanner_scan(
   TSLexer *lexer,
   const bool *valid_symbols
 ) {
-  // Scanner *s = (Scanner *)payload;
-
-  // printf("\033[1;31mSCANNER: LAST_TOKEN_NON_WORD %d\033[0m\n", valid_symbols[LAST_TOKEN_NON_WORD]);
-  // printf("\033[1;31mSCANNER: LAST_TOKEN_WORD %d\033[0m\n", valid_symbols[LAST_TOKEN_WORD]);
-  // printf("\033[1;31mSCANNER: STRONG_OPEN %d\033[0m\n", valid_symbols[STRONG_OPEN]);
-  // printf("\033[1;31mSCANNER: STRONG_CLOSE %d\033[0m\n", valid_symbols[STRONG_CLOSE]);
-  // printf("\033[1;31m==============================\033[0m\n");
-
   if (valid_symbols[ERROR]) {
-    // printf("\033[1;31mSCANNER: ERROR SYMBOL VALID (%d), aborting!\033[0m\n\n", valid_symbols[ERROR]);
     return false;
   }
   
   if (lexer->eof(lexer)) {
     return false;
+  }
+
+  // special case: RAW_CONTENT
+  if (valid_symbols[RAW_SINGLE_CONTENT] && lexer->lookahead != '`') { // Make sure that we don't try to parse raw_content if it could be a delimiter
+    return parse_raw_single_content(lexer, valid_symbols);
   }
 
   switch (lexer->lookahead) {
@@ -318,6 +426,9 @@ bool tree_sitter_typst_external_scanner_scan(
     case '<':
     case '>':
     return parse_label(lexer, valid_symbols);
+
+    case '`':
+    return parse_raw(lexer, valid_symbols, payload);
 
     case '\\':
     return parse_escape(lexer, valid_symbols);

@@ -1,0 +1,298 @@
+==================
+raw - single - normal
+==================
+`raw`
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (raw
+        (raw_single_open)
+        (raw_single_content)
+        (raw_single_close)))
+    (newline)))
+
+
+==================
+raw - single - empty
+==================
+``
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (raw
+        (raw_single_open)
+        (raw_single_close)))
+    (newline)))
+
+
+==================
+raw - single - with special chars
+==================
+`**\u{FFFF}_a_\a\\`
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (raw
+        (raw_single_open)
+        (raw_single_content)
+        (raw_single_close)))
+    (newline)))
+
+==================
+raw - single - multiple lines
+==================
+`raw
+
+
+
+
+raw`
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (raw
+        (raw_single_open)
+        (raw_single_content)
+        (raw_single_close)))
+    (newline)))
+
+
+==================
+raw - single - two empty with word in between
+==================
+``word``
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (raw
+        (raw_single_open)
+        (raw_single_close))
+      (word)
+      (raw
+        (raw_single_open)
+        (raw_single_close)))
+    (newline)))
+
+
+
+==================
+raw - single - in heading
+==================
+== `raw`
+
+---
+
+(markup_block
+  (heading
+    (heading_prefix)
+    (heading_whitespace)
+    (heading_content
+      (raw
+        (raw_single_open)
+        (raw_single_content)
+        (raw_single_close)))
+    (newline)))
+
+
+
+==================
+raw - single - in bold
+==================
+*`raw`*
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (strong
+        (strong_open)
+        (strong_content
+          (raw
+            (raw_single_open)
+            (raw_single_content)
+            (raw_single_close)))
+        (strong_close)))
+    (newline)))
+
+
+
+==================
+raw - single - in italic
+==================
+_`raw`_
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (italic
+        (italic_open)
+        (italic_content
+          (raw
+            (raw_single_open)
+            (raw_single_content)
+            (raw_single_close)))
+        (italic_close)))
+    (newline)))
+
+
+==================
+not raw - single - not two empty
+==================
+````
+
+---
+
+(markup_block
+  (ERROR
+    (raw_multiple_open)
+    (raw_multiple_content)))
+
+==================
+raw - multiple - only language
+==================
+```lang```
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (raw
+        (raw_multiple_open)
+        (raw_language_type)
+        (raw_multiple_close)))
+    (newline)))
+
+==================
+raw - multiple - only content
+==================
+``` raw```
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (raw
+        (raw_multiple_open)
+        (raw_multiple_content)
+        (raw_multiple_close)))
+    (newline)))
+
+
+==================
+raw - multiple - language and content
+==================
+```lang raw```
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (raw
+        (raw_multiple_open)
+        (raw_language_type)
+        (raw_multiple_content)
+        (raw_multiple_close)))
+    (newline)))
+
+
+==================
+raw - multiple - language and content with special chars
+==================
+```lang 
+*a* _hallo_ \u{AFFF}\\\n```
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (raw
+        (raw_multiple_open)
+        (raw_language_type)
+        (raw_multiple_content)
+        (raw_multiple_close)))
+    (newline)))
+
+
+==================
+raw - multiple - language and content with backticks inside
+==================
+```lang` raw ` ```
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (raw
+        (raw_multiple_open)
+        (raw_language_type)
+        (raw_multiple_content)
+        (raw_multiple_close)))
+    (newline)))
+
+
+==================
+raw - multiple - normal with more backticks
+==================
+````````````````````````````````````````````````````````````lang raw````````````````````````````````````````````````````````````
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (raw
+        (raw_multiple_open)
+        (raw_language_type)
+        (raw_multiple_content)
+        (raw_multiple_close)))
+    (newline)))
+
+
+==================
+not raw - multiple - not empty
+==================
+``````
+
+---
+
+(markup_block
+  (ERROR
+    (raw_multiple_open)
+    (raw_multiple_content)))
+
+
+==================
+not raw - multiple - backtick mismatch
+==================
+`````lang raw```
+
+---
+
+(markup_block
+  (ERROR
+    (raw_multiple_open)
+    (raw_language_type)
+    (raw_multiple_content)))
