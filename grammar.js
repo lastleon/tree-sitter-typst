@@ -104,7 +104,7 @@ module.exports = grammar({
       )),
       $.newline
     ),
-    heading_whitespace: $ => prec.left(repeat1(seq(/[ \t]/, optional($.last_token_non_word)))),
+    heading_whitespace: $ => seq(/(?:[ \t])+/, optional($.last_token_non_word)),
 
     heading_content: $ => repeat1(choice(
       $.word,
