@@ -1,7 +1,7 @@
 
 default:
 	@tree-sitter generate
-	@tree-sitter parse --time examples/example.typ
+	@tree-sitter parse --time --debug examples/example.typ
 
 small:
 	@tree-sitter generate
@@ -9,7 +9,11 @@ small:
 
 big:
 	@tree-sitter generate
-	@tree-sitter parse --time --debug examples/big_example.typ
+	@tree-sitter parse --time examples/big_example.typ
+
+headings:
+	@tree-sitter generate
+	@tree-sitter parse --time --debug examples/headings.typ
 
 test:
 	@tree-sitter test
