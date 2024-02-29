@@ -8,7 +8,11 @@
         "members": [
           {
             "type": "SYMBOL",
-            "name": "line"
+            "name": "heading"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "paragraph"
           },
           {
             "type": "SYMBOL",
@@ -17,25 +21,16 @@
         ]
       }
     },
-    "line": {
+    "paragraph": {
       "type": "SEQ",
       "members": [
         {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "heading"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "_line_content"
-            }
-          ]
+          "type": "SYMBOL",
+          "name": "_line_content"
         },
         {
           "type": "SYMBOL",
-          "name": "_newline"
+          "name": "_parbreak"
         }
       ]
     },
@@ -45,7 +40,11 @@
     },
     "_newline": {
       "type": "PATTERN",
-      "value": "\\n|\\r\\n?"
+      "value": "\\n"
+    },
+    "_parbreak": {
+      "type": "PATTERN",
+      "value": "\\n\\n"
     },
     "heading": {
       "type": "SEQ",
@@ -138,7 +137,7 @@
       "value": 5,
       "content": {
         "type": "PATTERN",
-        "value": "\\*[^a-zA-Z0-9]"
+        "value": "(\\*)[^a-zA-Z0-9]"
       }
     },
     "comment": {
@@ -157,7 +156,7 @@
         "value": 20,
         "content": {
           "type": "PATTERN",
-          "value": "\\/\\/.*"
+          "value": "\\/\\/[^\\n]*\\n"
         }
       }
     }

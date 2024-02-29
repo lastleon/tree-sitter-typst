@@ -11,7 +11,8 @@ Originally, the *prediction* model was only able to recommend the next component
 *hallo*
 *hallo*
 
-== Hello _there_
+== Hello *the
+re* haha
 
 ==
 On a high level, there are two major changes. First, the new model now has another output that is tasked with predicting the node onto which the next component should be added, making it a multi-task model. Second, the component classification now happens per node, as opposed to the per graph classification that was previously done, meaning the model predicts for each node what the next component could be. The final model prediction is then determined by combining both outputs.

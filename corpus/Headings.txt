@@ -61,3 +61,18 @@ This is some other text, but not a heading
   (line)
   (line))
 
+
+==================
+Edge Case - strong in heading
+==================
+
+= This is a *pre
+tty* long heading!
+
+
+---
+
+(markup_block
+  (heading
+    (heading_text 
+      (strong))))

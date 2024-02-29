@@ -5,6 +5,8 @@ const PREC = {
 }
 const ALPHANUM_CHARS = "[a-zA-Z0-9]";
 const NON_ALPHANUM_CHARS = "[^a-zA-Z0-9]";
+// const NEWLINE = "\\n|\\r\\n"
+const NEWLINE = "\\n";
 
 module.exports = grammar({
   name: 'typst',
@@ -17,17 +19,25 @@ module.exports = grammar({
 
   rules: {
     // content
-    markup_block: $ => repeat(choice($.line, $._emptyline)),
+    markup_block: $ => repeat(choice(
+      $.heading,
+      $.paragraph, 
+      $._emptyline
+    )),
+
+    // heading
+    // paragraph
+    // code
     
-    line: $ => seq(
-      choice(
-        $.heading,
-        $._line_content
-      ),
-      $._newline,
+    // line: $ => $._line_content,
+    paragraph: $ => seq(
+      $._line_content,
+      $._parbreak
     ),
+
     _emptyline: $ => $._newline, // TODO: Maybe use alias?
-    _newline: $ => /\n|\r\n?/,
+    _newline: $ => /\n/, // TODO: use NEWLINE
+    _parbreak: $ => /\n\n/, // TODO: use NEWLINE
 
     // Headings
     heading: $ => seq(
@@ -55,7 +65,7 @@ module.exports = grammar({
       $._strong_delim_cls,
     ),
     _strong_delim_opn: $ => token(prec(PREC.STRONG, new RegExp(`${NON_ALPHANUM_CHARS}\\\*`))),
-    _strong_delim_cls: $ => prec(PREC.STRONG, new RegExp(`\\\*${NON_ALPHANUM_CHARS}`)),
+    _strong_delim_cls: $ => prec(PREC.STRONG, new RegExp(`(\\\*)${NON_ALPHANUM_CHARS}`)),
 
     // Comments
     comment: $ => choice(
@@ -63,7 +73,7 @@ module.exports = grammar({
       // $.block_comment,
     ),
 
-    line_comment: $ => token(prec(PREC.COMMENT, /\/\/.*/)),
+    line_comment: $ => token(prec(PREC.COMMENT, new RegExp(`//[^${NEWLINE}]*${NEWLINE}`))),
     // block_comment: $ => seq(
     //   "/*", 
     //   // /[.*\n]*.*/,
