@@ -65,7 +65,7 @@ module.exports = grammar({
       $._strong_delim_cls,
     ),
     _strong_delim_opn: $ => token(prec(PREC.STRONG, new RegExp(`${NON_ALPHANUM_CHARS}\\\*`))),
-    _strong_delim_cls: $ => prec(PREC.STRONG, new RegExp(`(\\\*)${NON_ALPHANUM_CHARS}`)),
+    _strong_delim_cls: $ => prec(PREC.STRONG, new RegExp(`\\\*${NON_ALPHANUM_CHARS}`)),
 
     // Comments
     comment: $ => choice(
