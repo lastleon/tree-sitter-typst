@@ -1,0 +1,63 @@
+==================
+Normal Heading
+==================
+
+= Heading
+
+---
+
+(markup_block
+  (line
+    (heading
+      (heading_text))))
+
+==================
+Deep Heading
+==================
+
+=========================== Heading
+
+---
+
+(markup_block
+  (line
+    (heading
+      (heading_text))))
+
+
+==================
+Not Heading - no space
+==================
+
+==Heading
+
+---
+
+(markup_block
+  (line)) 
+
+==================
+Not Heading - no text
+==================
+
+==
+
+---
+
+(markup_block
+  (line)) 
+
+
+==================
+Not Heading - no text, but below
+==================
+
+==
+This is some other text, but not a heading
+
+---
+
+(markup_block
+  (line)
+  (line))
+

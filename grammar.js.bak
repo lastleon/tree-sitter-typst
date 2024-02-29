@@ -1,0 +1,58 @@
+const PREC = {
+  COMMENT: 20,
+  HEADING: 10,
+}
+
+module.exports = grammar({
+  name: 'typst',
+
+  extras: $ => [
+    $.comment,
+  ],
+
+  rules: {
+    // content
+    content_block: $ => repeat(choice($.line, $._newline)),
+    
+    line: $ => seq(
+      choice(
+        $.heading,
+        repeat1($._lineelement),
+      ),
+      $._newline,
+    ),
+
+    heading: $ => seq(
+      $._heading_prefix,
+      $.heading_text,
+    ),
+    _heading_prefix: $ => /=+[ |\t]+/, // at least one tab or space needed to be recognized as heading
+    heading_text: $ => /[^\n]+/, // TODO: change what text looks like
+
+    _lineelement: $ => choice(
+      $.text,
+    ),
+    _newline: $ => /\n|\r\n?/,
+
+
+
+    text: $ => /[^\n]+/,
+
+
+    // comments
+    comment: $ => choice(
+      $.line_comment,
+      $.block_comment,
+    ),
+
+    line_comment: $ => seq("//", /.*/),
+    block_comment: $ => seq(
+      "/*", 
+      // /[.*\n]*.*/,
+      /[^*]*\*+([^/*][^*]*\*+)*/, // TODO, taken from java grammar
+      //"*/", 
+      "/", 
+    ),
+  }
+});
+

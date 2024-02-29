@@ -1,0 +1,21 @@
+{
+  "name": "tree-sitter-typst",
+  "version": "0.0.1",
+  "description": "A Typst Treesitter Grammar",
+  "main": "bindings/node",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "leont",
+  "license": "ISC",
+  "dependencies": {
+    "nan": "^2.18.0"
+  },
+  "tree-sitter": [{
+    "scope": "source.typ",
+    "file-types": [
+      "typ"
+    ],
+    "highlights": "queries/highlights.scm"
+  }]
+}

@@ -1,0 +1,28 @@
+==================
+Line Comment
+==================
+
+// This is a comment
+
+--
+
+(markup_block
+  (comment
+    (line_comment))) 
+
+
+
+==================
+Block Comment
+==================
+
+/*
+This is a comment
+
+*/
+
+---
+
+(markup_block
+  (comment
+    (block_comment))) 

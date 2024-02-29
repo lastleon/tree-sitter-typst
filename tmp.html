@@ -1,0 +1,88 @@
+
+<!doctype HTML>
+<head>
+  <title>Tree-sitter Highlighting</title>
+  <style>
+    body {
+      font-family: monospace
+    }
+    .line-number {
+      user-select: none;
+      text-align: right;
+      color: rgba(27,31,35,.3);
+      padding: 0 10px;
+    }
+    .line {
+      white-space: pre;
+    }
+  </style>
+</head>
+<body>
+
+<table>
+<tr><td class=line-number>1</td><td class=line><span style='font-style: italic;color: #8a8a8a'>// This is a comment</span>
+</td></tr>
+<tr><td class=line-number>2</td><td class=line>= 
+</td></tr>
+<tr><td class=line-number>3</td><td class=line><span style='font-style: italic;color: #8a8a8a'>// This too</span>
+</td></tr>
+<tr><td class=line-number>4</td><td class=line><span style='color: #008787'>= Introduction And Short Overview </span>
+</td></tr>
+<tr><td class=line-number>5</td><td class=line>Originally, the<span style='color: #5f00d7'> *p</span>rediction* model was only able to recommend the next component that should be added to<span style='color: #5f00d7'> *s</span>trong* the _italic_ construction, _but `adskfaks #footnote[a] ldjf` not_ where to add it. This project explores a possible modification of the preexisting architecture in order to change that. #footnote[ayo]
+</td></tr>
+<tr><td class=line-number>6</td><td class=line>
+</td></tr>
+<tr><td class=line-number>7</td><td class=line><span style='color: #008787'>==          ayo</span>
+</td></tr>
+<tr><td class=line-number>8</td><td class=line>
+</td></tr>
+<tr><td class=line-number>9</td><td class=line><span style='color: #008787'>== Hello _there_</span>
+</td></tr>
+<tr><td class=line-number>10</td><td class=line>
+</td></tr>
+<tr><td class=line-number>11</td><td class=line>==
+</td></tr>
+<tr><td class=line-number>12</td><td class=line>On a high level, there are two major changes. First, the new model now has another output that is tasked with predicting the node onto which the next component should be added, making it a multi-task model. Second, the component classification now happens per node, as opposed to the per graph classification that was previously done, meaning the model predicts for each node what the next component could be. The final model prediction is then determined by combining both outputs.
+</td></tr>
+<tr><td class=line-number>13</td><td class=line>
+</td></tr>
+<tr><td class=line-number>14</td><td class=line>The following sections will detail how the dataset is created, have specifics about the architecture and briefly show the findings.
+</td></tr>
+<tr><td class=line-number>15</td><td class=line>
+</td></tr>
+<tr><td class=line-number>16</td><td class=line><span style='color: #008787'>= System</span>
+</td></tr>
+<tr><td class=line-number>17</td><td class=line>The most important files are located in `enco_prediction_scripts/` and `models/enco_prediction/`, in the branch `feature/add-ext-node-pred`. #footnote[enco is an acronym for #strong[E]xtension #strong[N]ode#strong[Co]mponent]. 
+</td></tr>
+<tr><td class=line-number>18</td><td class=line>
+</td></tr>
+<tr><td class=line-number>19</td><td class=line><span style='color: #008787'>== Dataset &lt;sec:dataset&gt;</span>
+</td></tr>
+<tr><td class=line-number>20</td><td class=line>This project was only tested on the `festo_fdt` dataset. There are two steps in creating it:
+</td></tr>
+<tr><td class=line-number>21</td><td class=line>- #[
+</td></tr>
+<tr><td class=line-number>22</td><td class=line>    `create_enco_partial_graphs.py`: The actual creation of the partial graphs (objects of graph class specified in `preprocessing/graph.py`) with their labels (dictionary containing target node and component, objects of classes in `preprocessing/{node,component}.py`). The resulting (graph, label) tuple list is pickled and stored in `enco_festo_fdt_partial_graphs_{train,val,test}.dat`. A single (graph, label) instance looks like this:
+</td></tr>
+<tr><td class=line-number>23</td><td class=line>    ```python
+</td></tr>
+<tr><td class=line-number>24</td><td class=line>    (graph, {
+</td></tr>
+<tr><td class=line-number>25</td><td class=line>      &quot;target_node&quot;: &lt;the target node object of the graph&gt;,
+</td></tr>
+<tr><td class=line-number>26</td><td class=line>      &quot;target_component&quot;: &lt;the target component object of the graph&gt;
+</td></tr>
+<tr><td class=line-number>27</td><td class=line>    })
+</td></tr>
+<tr><td class=line-number>28</td><td class=line>    ```
+</td></tr>
+<tr><td class=line-number>29</td><td class=line>    This format was chosen so that the data is easily interpretable, even only on its own.
+</td></tr>
+<tr><td class=line-number>30</td><td class=line>  ]
+</td></tr>
+<tr><td class=line-number>31</td><td class=line>
+</td></tr>
+</table>
+
+</body>
+
