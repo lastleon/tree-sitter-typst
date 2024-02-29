@@ -26,6 +26,19 @@ reference - valid chars with colon
     (newline)))
 
 
+==================
+reference - valid chars with multiple colons
+==================
+@valid:::::valid
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (reference))
+    (newline)))
+
 
 ==================
 reference - valid chars with colon following the reference

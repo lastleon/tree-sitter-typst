@@ -16,4 +16,5 @@ headings:
 	@tree-sitter parse --time --debug examples/headings.typ
 
 test:
+	@tree-sitter generate
 	@tree-sitter test

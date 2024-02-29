@@ -18,7 +18,13 @@
     - [x] Testing implemented
 - [ ] Raw text
 - [ ] Link (Probably won't support)
-- [ ] Label
+- [~] Label
+    - [ ] Support
+        - [x] Basic
+        - [ ] Full
+        - **TODO**:
+            - Non-latin letter support
+    - [x] Testing implemented
 - [~] Reference
     - [ ] Support
         - [x] Basic
@@ -26,10 +32,12 @@
         - **TODO**:
             - Non-latin letter support
     - [x] Testing implemented
-- [x] Heading
+- [~] Heading
     - [x] Support
         - [x] Basic
-        - [x] Full
+        - [ ] Full
+        - **TODO**:
+            - Label in heading
     - [x] Testing implemented
 - [ ] Bullet list
 - [ ] Numbered list

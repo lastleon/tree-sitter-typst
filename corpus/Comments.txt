@@ -51,3 +51,16 @@ ong*
         (strong_close)))
     (newline)))
 
+
+==================
+line_comment - non word chars in comment
+==================
+//comment: other comment
+
+---
+
+(markup_block
+  (comment
+    (line_comment))
+  (newline))
+

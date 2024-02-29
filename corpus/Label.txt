@@ -1,0 +1,199 @@
+==================
+label - only valid chars
+==================
+<abc123-_>
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (label
+        (label_open)
+        (label_content)
+        (label_close)))
+    (newline)))
+
+
+==================
+label - valid chars with colon
+==================
+<valid:valid>
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (label
+        (label_open)
+        (label_content)
+        (label_close)))
+    (newline)))
+
+
+==================
+label - multiple colons
+==================
+<notlabel:::::notlabel>
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (label
+        (label_open)
+        (label_content)
+        (label_close)))
+    (newline)))
+
+
+==================
+label - in between words
+==================
+word<valid:valid>word
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (word)
+      (label
+        (label_open)
+        (label_content)
+        (label_close))
+      (word))
+    (newline)))
+
+
+==================
+label - inside strong
+==================
+*<label>*
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (strong
+        (strong_open)
+        (strong_content
+          (label
+            (label_open)
+            (label_content)
+            (label_close)))
+        (strong_close)))
+    (newline)))
+
+
+==================
+label - inside italic
+==================
+_<label>_
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (italic
+        (italic_open)
+        (italic_content
+          (label
+            (label_open)
+            (label_content)
+            (label_close)))
+        (italic_close)))
+    (newline)))
+
+
+
+==================
+label - edge case - in headline
+==================
+== Headline <label> Line
+
+---
+
+(markup_block
+  (heading
+    (heading_prefix)
+    (heading_whitespace)
+    (heading_content
+      (word)
+      (whitespace))
+    (label
+      (label_open)
+      (label_content)
+      (label_close))
+    (line
+      (line_content
+        (whitespace)
+        (word))
+      (newline))))
+
+
+==================
+label - edge case - in headline with following equalssigns
+==================
+== Headline <label>== Line
+
+---
+
+(markup_block
+  (heading
+    (heading_prefix)
+    (heading_whitespace)
+    (heading_content
+      (word)
+      (whitespace))
+    (label
+      (label_open)
+      (label_content)
+      (label_close))
+    (line
+      (line_content
+        (special
+          (equalsigns)
+          (equalsigns))
+        (whitespace)
+        (word))
+      (newline))))
+
+
+==================
+not label - invalid chars
+==================
+<$$>
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (less_than)
+      (special)
+      (more_than))
+    (newline)))
+
+
+==================
+not label - invalid char but looks like label
+==================
+< notlabel>
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (less_than)
+      (whitespace)
+      (word)
+      (more_than))
+    (newline)))
+
+

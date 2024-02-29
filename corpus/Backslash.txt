@@ -1,0 +1,405 @@
+==================
+backslash - linebreak - line
+==================
+Word \ Word
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (word)
+      (whitespace)
+      (linebreak)
+      (whitespace)
+        (word))
+    (newline)))
+
+
+==================
+backslash - linebreak - heading
+==================
+===== \ Heading
+
+---
+
+(markup_block
+  (heading
+    (heading_prefix)
+    (heading_whitespace)
+    (heading_content
+      (linebreak)
+      (whitespace)
+      (word))
+    (newline)))
+
+
+==================
+backslash - linebreak - strong
+==================
+*\ word*
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (strong
+        (strong_open)
+        (strong_content
+          (linebreak)
+          (whitespace)
+          (word))
+        (strong_close)))
+    (newline)))
+
+
+==================
+backslash - linebreak - italic
+==================
+_\ word_
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (italic
+        (italic_open)
+        (italic_content
+          (linebreak)
+          (whitespace)
+          (word))
+        (italic_close)))
+    (newline)))
+
+
+==================
+backslash - escaped character - normal word char
+==================
+\a
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (escaped_character
+        (escape_backslash)))
+    (newline)))
+
+
+==================
+backslash - escaped character - normal non word char
+==================
+\(
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (escaped_character
+        (escape_backslash)))
+    (newline)))
+
+
+==================
+backslash - escaped character - in heading
+==================
+===== \(
+
+---
+
+(markup_block
+  (heading
+    (heading_prefix)
+    (heading_whitespace)
+    (heading_content
+      (escaped_character
+        (escape_backslash)))
+    (newline)))
+
+
+==================
+backslash - escaped character - in between words
+==================
+word\(word
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (word)
+      (escaped_character
+        (escape_backslash))
+      (word))
+    (newline)))
+
+
+==================
+backslash - escaped character - strong
+==================
+word*\(word*
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (word)
+      (strong
+        (strong_open)
+        (strong_content
+          (escaped_character
+            (escape_backslash))
+          (word))
+        (strong_close)))
+    (newline)))
+
+
+
+==================
+backslash - escaped character - italic
+==================
+word_\(word_
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (word)
+      (italic
+        (italic_open)
+        (italic_content
+          (escaped_character
+            (escape_backslash))
+          (word))
+        (italic_close)))
+    (newline)))
+
+==================
+backslash - escaped character - not strong
+==================
+\a*word*
+
+---
+
+(ERROR
+  (escaped_character
+    (escape_backslash))
+  (star)
+  (word)
+  (strong_open))
+
+
+==================
+backslash - escaped character - not italic
+==================
+\a_word_
+
+---
+
+(ERROR
+  (escaped_character
+    (escape_backslash))
+  (underscore)
+  (word)
+  (italic_open))
+
+
+==================
+backslash - escaped character - u properly escaped
+==================
+\u
+
+---
+
+(markup_block
+  (line
+    (line_content
+	  (escaped_character
+      (escape_backslash)))
+    (newline)))
+
+
+==================
+backslash - unicode escape - normal
+==================
+\u{aaaa}
+
+---
+
+(markup_block
+  (line
+    (line_content
+	  (unicode_escape
+		  (unicode_escape_internal)))
+    (newline)))
+
+==================
+backslash - unicode escape - heading
+==================
+== \u{aaaa}
+
+---
+
+(markup_block
+  (heading
+    (heading_prefix)
+    (heading_whitespace)
+    (heading_content
+      (unicode_escape
+        (unicode_escape_internal)))
+    (newline)))
+
+==================
+backslash - unicode escape - strong
+==================
+*\u{aaaa}*
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (strong
+        (strong_open)
+        (strong_content
+          (unicode_escape
+            (unicode_escape_internal)))
+        (strong_close)))
+    (newline)))
+
+
+==================
+backslash - unicode escape - italic
+==================
+_\u{aaaa}_
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (italic
+        (italic_open)
+        (italic_content
+          (unicode_escape
+            (unicode_escape_internal)))
+        (italic_close)))
+    (newline)))
+
+==================
+backslash - unicode escape - strong after word char as unicode
+==================
+\u{43}*word*
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (unicode_escape
+        (unicode_escape_internal))
+      (strong
+        (strong_open)
+        (strong_content
+          (word))
+        (strong_close)))
+    (newline)))
+
+
+==================
+backslash - unicode escape - italic after word char as unicode
+==================
+\u{43}_word_
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (unicode_escape
+        (unicode_escape_internal))
+      (italic
+        (italic_open)
+        (italic_content
+          (word))
+        (italic_close)))
+    (newline)))
+
+
+==================
+backslash - unicode escape - empty
+==================
+\u{}
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (unicode_escape
+        (unicode_escape_internal)))
+    (newline)))
+
+
+==================
+backslash - unicode escape - too many hex digits
+==================
+\u{aaaaaaa}
+
+---
+
+(markup_block
+  (ERROR)
+  (line
+    (line_content
+      (word)
+      (special)
+      (word)
+      (special))
+    (newline)))
+
+
+==================
+backslash - unicode escape - wrong chars in brackets
+==================
+\u{%%}
+
+---
+
+(markup_block
+  (ERROR)
+  (line
+    (line_content
+      (word)
+      (special))
+    (newline)))
+
+
+
+==================
+backslash - unicode escape - newline in brackets
+==================
+\u{a
+a}
+
+---
+
+(markup_block
+  (ERROR)
+  (line
+    (line_content
+      (word)
+      (special)
+      (word))
+    (newline))
+  (line
+    (line_content
+      (word)
+      (special))
+    (newline)))
