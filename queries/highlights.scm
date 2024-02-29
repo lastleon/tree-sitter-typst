@@ -1,4 +1,5 @@
 ; (comment) @comment
 ; (heading) @markup.heading
 (heading) @string.special
-(strong) @keyword
+(strong) @constant.builtin
+(italic) @attribute

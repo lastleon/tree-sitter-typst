@@ -1,6 +1,9 @@
 const PREC = {
   STAR: -2,
+  UNDERSCORE: -2,
 }
+
+WORD = /(?:[a-zA-Z0-9])+/
 
 module.exports = grammar({
   name: 'typst',
@@ -11,6 +14,9 @@ module.exports = grammar({
 
     $.strong_open,
     $.strong_close,
+
+    $.italic_open,
+    $.italic_close,
 
     // Ambiguous heading start
     $.heading_prefix,
@@ -39,9 +45,10 @@ module.exports = grammar({
     newline: $ => seq(/\r?\n/, optional($.last_token_non_word)),
     whitespace: $ => prec.right(repeat1(seq(/[ \t]/, optional($.last_token_non_word)))), // prec.right => match rule as long as possible
 
-    word: $ => seq(/\w+/, optional($.last_token_word)),
-    special: $ => prec.right(repeat1(seq(choice(/[^\w \t\*=]/, $.equalsigns), optional($.last_token_non_word)))), // prec.right => match rule as long as possible
+    word: $ => seq(WORD, optional($.last_token_word)),
+    special: $ => prec.right(repeat1(seq(choice(/[^\w \t\*=]/, $.equalsigns), optional($.last_token_non_word)))), // \w contains underscore, so we do not need to list it seperately
     star: $ => prec(PREC.STAR, seq("*", optional($.last_token_non_word))),
+    underscore: $ => prec(PREC.UNDERSCORE, seq("_", optional($.last_token_non_word))),
 
     // STRONG
     strong: $ => seq(
@@ -53,7 +60,25 @@ module.exports = grammar({
       $.word,
       $.special,
       $.whitespace,
+      $.italic,
       $.star,
+      $.underscore,
+      $.newline,
+    )),
+
+    // ITALIC
+    italic: $ => seq(
+      seq($.italic_open, optional($.last_token_non_word)),
+      optional($.italic_content),
+      seq($.italic_close, optional($.last_token_non_word)),
+    ),
+    italic_content: $ => repeat1(choice(
+      $.word,
+      $.special,
+      $.whitespace,
+      $.strong,
+      $.star,
+      $.underscore,
       $.newline,
     )),
 
@@ -73,6 +98,7 @@ module.exports = grammar({
       $.special,
       $.whitespace,
       $.strong,
+      $.italic,
       $.star,
     )),
 
@@ -88,8 +114,13 @@ module.exports = grammar({
         $.special,
         $.whitespace,
         $.strong,
+        $.italic,
         $.star,
+        $.underscore,
     )),
+
+    // COMMENT
+    
   },
 
 });

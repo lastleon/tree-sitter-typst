@@ -12,6 +12,9 @@ typedef enum {
   STRONG_OPEN,
   STRONG_CLOSE,
 
+  ITALIC_OPEN,
+  ITALIC_CLOSE,
+
   HEADING_PREFIX,
   EQUALSIGNS,
 
@@ -75,6 +78,40 @@ bool parse_strong(TSLexer *lexer, const bool *valid_symbols) {
         lexer->result_symbol = STRONG_OPEN;
       } else if (valid_symbols[STRONG_CLOSE]) {
         lexer->result_symbol = STRONG_CLOSE;
+      }
+
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool parse_italic(TSLexer *lexer, const bool *valid_symbols) {
+  const bool ITALIC_VALID = valid_symbols[ITALIC_OPEN] || valid_symbols[ITALIC_CLOSE];
+  const bool EMPH_POSSIBLE = valid_symbols[LAST_TOKEN_WORD] || valid_symbols[LAST_TOKEN_NON_WORD];
+
+  if (ITALIC_VALID && EMPH_POSSIBLE) {
+
+    // we need to check if it is a delimiter
+    lexer->advance(lexer, false);
+
+    bool is_delimiter = true;
+
+    // if LAST_TOKEN_NON_WORD, then the underscore is a delimiter
+    // otherwise: only way it is not a delimiter is if the last token
+    // was a word and the next one also is
+    if (valid_symbols[LAST_TOKEN_WORD]
+        && !lexer->eof(lexer)
+        && isalnum((char) lexer->lookahead)) { // TODO: IMPROVE SUPPORT FOR NON-LATIN CHARACTERS
+      is_delimiter = false;
+    }
+
+    if (is_delimiter) {
+      if (valid_symbols[ITALIC_OPEN]) {
+        lexer->result_symbol = ITALIC_OPEN;
+      } else if (valid_symbols[ITALIC_CLOSE]) {
+        lexer->result_symbol = ITALIC_CLOSE;
       }
 
       return true;
@@ -170,7 +207,12 @@ bool tree_sitter_typst_external_scanner_scan(
 
     return parse_strong(lexer, valid_symbols);
 
+  } else if (lexer->lookahead == '_') {
+
+    return parse_italic(lexer, valid_symbols);
+
   }
+
 
   return false;
 }
