@@ -1,78 +1,225 @@
 ==================
-Normal Heading
+heading - normal
 ==================
-
 = Heading
 
 ---
 
 (markup_block
-  (line
-    (heading
-      (heading_text))))
+  (heading
+    (heading_prefix)
+    (heading_whitespace)
+    (heading_content
+      (word))
+    (newline)))
 
 ==================
-Deep Heading
+heading - deep 
 ==================
-
 =========================== Heading
 
 ---
 
 (markup_block
-  (line
-    (heading
-      (heading_text))))
+  (heading
+    (heading_prefix)
+    (heading_whitespace)
+    (heading_content
+      (word))
+    (newline)))
 
 
 ==================
-Not Heading - no space
+heading - with emphasis
 ==================
-
-==Heading
-
----
-
-(markup_block
-  (line)) 
-
-==================
-Not Heading - no text
-==================
-
-==
-
----
-
-(markup_block
-  (line)) 
-
-
-==================
-Not Heading - no text, but below
-==================
-
-==
-This is some other text, but not a heading
-
----
-
-(markup_block
-  (line)
-  (line))
-
-
-==================
-Edge Case - strong in heading
-==================
-
-= This is a *pre
-tty* long heading!
-
+= _Heading_
 
 ---
 
 (markup_block
   (heading
-    (heading_text 
-      (strong))))
+    (heading_prefix)
+    (heading_whitespace)
+    (heading_content
+      (italic
+        (italic_open)
+        (italic_content
+          (word))
+        (italic_close)))
+    (newline)))
+
+
+==================
+heading - with reference
+==================
+= @Heading
+
+---
+
+(markup_block
+  (heading
+    (heading_prefix)
+    (heading_whitespace)
+    (heading_content
+      (reference))
+    (newline)))
+
+==================
+heading - without space and text
+==================
+==
+
+---
+
+(markup_block
+  (heading
+    (heading_prefix)
+    (newline)))
+
+
+==================
+heading - with space and no text
+==================
+== 
+
+---
+
+(markup_block
+  (heading
+    (heading_prefix)
+    (heading_whitespace)
+    (newline)))
+
+
+==================
+heading - no text and line after
+==================
+== 
+text
+
+---
+
+(markup_block
+  (heading
+    (heading_prefix)
+    (heading_whitespace)
+    (newline))
+  (line
+    (line_content
+      (word))
+    (newline)))
+
+
+==================
+heading - with preceeding newline
+==================
+
+== Heading
+
+---
+
+(markup_block
+  (newline)
+  (heading
+    (heading_prefix)
+    (heading_whitespace)
+    (heading_content
+      (word))
+    (newline)))
+
+==================
+heading - with leading space (tabs and spaces)
+==================
+                == Heading
+
+---
+
+(markup_block
+  (markup_leading_whitespace)
+  (heading
+    (heading_prefix)
+    (heading_whitespace)
+    (heading_content
+      (word))
+    (newline)))
+
+
+==================
+heading - with leading space and following line
+==================
+                == Heading
+    Line
+
+---
+
+(markup_block
+  (markup_leading_whitespace)
+  (heading
+    (heading_prefix)
+    (heading_whitespace)
+    (heading_content
+      (word))
+    (newline))
+  (markup_leading_whitespace)
+  (line
+    (line_content
+      (word))
+    (newline)))
+
+
+==================
+heading - much heading_whitespace
+==================
+==            Heading
+
+---
+
+(markup_block
+  (heading
+    (heading_prefix)
+    (heading_whitespace)
+    (heading_content
+      (word))
+    (newline)))
+
+
+==================
+heading - edge case - emphasis with newline in heading
+==================
+= *hea
+ding* heading
+
+---
+
+(markup_block
+  (heading
+    (heading_prefix)
+    (heading_whitespace)
+    (heading_content
+      (strong
+        (strong_open)
+        (strong_content
+          (word)
+          (newline)
+          (word))
+        (strong_close))
+      (whitespace)
+      (word))
+    (newline)))
+
+==================
+not heading - no space
+==================
+==text
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (special
+        (equalsigns))
+      (word))
+    (newline))) 
+
+

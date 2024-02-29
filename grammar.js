@@ -5,6 +5,13 @@ const PREC = {
 
 WORD = /(?:[a-zA-Z0-9])+/
 
+// Reference token
+// A reference name can only contain the chars listed in REF_VALID_NAME, and additionally a colon
+// if at least one of the chars in REF_VALID_NAME follows it
+REF_VALID_NAME = "(?:[a-zA-Z0-9\\-_])+"
+REFERENCE_NAME_REGEX = new RegExp(`${REF_VALID_NAME}(?::${REF_VALID_NAME})*`)
+
+
 module.exports = grammar({
   name: 'typst',
 
@@ -18,14 +25,18 @@ module.exports = grammar({
     $.italic_open,
     $.italic_close,
 
-    // Ambiguous heading start
+    // Needed because heading starts are ambiguous
     $.heading_prefix,
     $.equalsigns,
 
     $.__error_canary // This is never used in the grammar and exists solely to indicate to scanner.c that tree-sitter is in error mode
   ],
 
-  extras: $ => [], // Needed because otherwise tree-sitter consumes characters that are needed, e.g. some newlines, ...
+  extras: $ => [
+    $.comment,
+    $.line_comment,
+    // $.block_comment
+  ], // Needed because otherwise tree-sitter consumes characters that are needed, e.g. some newlines, ...
 
   rules: {
     markup_block: $ => seq(optional($.last_token_non_word), repeat($._markup_content)),
@@ -46,7 +57,7 @@ module.exports = grammar({
     whitespace: $ => prec.right(repeat1(seq(/[ \t]/, optional($.last_token_non_word)))), // prec.right => match rule as long as possible
 
     word: $ => seq(WORD, optional($.last_token_word)),
-    special: $ => prec.right(repeat1(seq(choice(/[^\w \t\*=]/, $.equalsigns), optional($.last_token_non_word)))), // \w contains underscore, so we do not need to list it seperately
+    special: $ => prec.right(repeat1(seq(choice(/[^\w \t\*=@]/, $.equalsigns), optional($.last_token_non_word)))), // \w contains underscore, so we do not need to list it seperately
     star: $ => prec(PREC.STAR, seq("*", optional($.last_token_non_word))),
     underscore: $ => prec(PREC.UNDERSCORE, seq("_", optional($.last_token_non_word))),
 
@@ -61,6 +72,7 @@ module.exports = grammar({
       $.special,
       $.whitespace,
       $.italic,
+      $.reference,
       $.star,
       $.underscore,
       $.newline,
@@ -77,6 +89,7 @@ module.exports = grammar({
       $.special,
       $.whitespace,
       $.strong,
+      $.reference,
       $.star,
       $.underscore,
       $.newline,
@@ -99,7 +112,9 @@ module.exports = grammar({
       $.whitespace,
       $.strong,
       $.italic,
+      $.reference,
       $.star,
+      $.underscore,
     )),
 
     // LINE
@@ -115,12 +130,29 @@ module.exports = grammar({
         $.whitespace,
         $.strong,
         $.italic,
+        $.reference,
         $.star,
         $.underscore,
     )),
 
+    // REFERENCE
+    reference: $ => seq("@", REFERENCE_NAME_REGEX, optional($.last_token_word)),
+
     // COMMENT
-    
+    comment: $ => choice(
+      $.line_comment,
+      // $.block_comment,
+    ),
+
+    line_comment: $ => /\/\/[^\n(?:\r\n)]*/,
+    // block_comment: $ => /\*[.\n\r]*\*\//,
+    // block_comment: $ => seq(
+    //   "/*", 
+    //   // /[.*\n]*.*/,
+    //   /[^*]*\*+([^/*][^*]*\*+)*/, // TODO, taken from java grammar
+    //   //"*/", 
+    //   "/", 
+    // ),
   },
 
 });

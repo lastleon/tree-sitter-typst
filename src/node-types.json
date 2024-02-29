@@ -1,5 +1,20 @@
 [
   {
+    "type": "comment",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "line_comment",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "heading",
     "named": true,
     "fields": {},
@@ -39,6 +54,10 @@
           "named": true
         },
         {
+          "type": "reference",
+          "named": true
+        },
+        {
           "type": "special",
           "named": true
         },
@@ -48,6 +67,10 @@
         },
         {
           "type": "strong",
+          "named": true
+        },
+        {
+          "type": "underscore",
           "named": true
         },
         {
@@ -116,6 +139,10 @@
           "named": true
         },
         {
+          "type": "reference",
+          "named": true
+        },
+        {
           "type": "special",
           "named": true
         },
@@ -174,6 +201,10 @@
           "named": true
         },
         {
+          "type": "reference",
+          "named": true
+        },
+        {
           "type": "special",
           "named": true
         },
@@ -183,6 +214,10 @@
         },
         {
           "type": "strong",
+          "named": true
+        },
+        {
+          "type": "underscore",
           "named": true
         },
         {
@@ -252,6 +287,21 @@
       "types": [
         {
           "type": "last_token_non_word",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "reference",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "last_token_word",
           "named": true
         }
       ]
@@ -335,6 +385,10 @@
           "named": true
         },
         {
+          "type": "reference",
+          "named": true
+        },
+        {
           "type": "special",
           "named": true
         },
@@ -407,6 +461,10 @@
     "named": false
   },
   {
+    "type": "@",
+    "named": false
+  },
+  {
     "type": "_",
     "named": false
   },
@@ -432,6 +490,10 @@
   },
   {
     "type": "last_token_word",
+    "named": true
+  },
+  {
+    "type": "line_comment",
     "named": true
   },
   {

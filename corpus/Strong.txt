@@ -1,0 +1,195 @@
+==================
+strong - normal
+==================
+*strong*
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (strong
+        (strong_open)
+        (strong_content
+          (word))
+        (strong_close)))
+    (newline)))
+
+
+==================
+strong - multiple contents
+==================
+*strong _italic_ @ref*
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (strong
+        (strong_open)
+        (strong_content
+          (word)
+          (whitespace)
+          (italic
+            (italic_open)
+            (italic_content
+              (word))
+            (italic_close))
+          (whitespace)
+          (reference))
+        (strong_close)))
+    (newline)))
+
+
+==================
+strong - non_word in front
+==================
+$*strong*
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (special)
+      (strong
+        (strong_open)
+        (strong_content
+          (word))
+        (strong_close)))
+    (newline)))
+
+
+==================
+strong - non_word behind front
+==================
+a*$strong*
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (word)
+      (strong
+        (strong_open)
+        (strong_content
+          (special)
+          (word))
+        (strong_close)))
+    (newline)))
+
+
+==================
+strong - non_word behind
+==================
+*strong*$
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (strong
+        (strong_open)
+        (strong_content
+          (word))
+        (strong_close))
+      (special))
+    (newline)))
+
+
+==================
+strong - non_word in front of behind
+==================
+*strong$*a
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (strong
+        (strong_open)
+        (strong_content
+          (word)
+          (special))
+        (strong_close))
+      (word))
+    (newline)))
+
+
+==================
+strong - italic inside
+==================
+*_italic_*
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (strong
+        (strong_open)
+        (strong_content
+          (italic
+            (italic_open)
+            (italic_content
+              (word))
+            (italic_close)))
+        (strong_close)))
+    (newline)))
+
+
+==================
+strong - empty
+==================
+**
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (strong
+        (strong_open)
+        (strong_close)))
+    (newline)))
+
+
+==================
+strong - containing newline
+==================
+*
+*
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (strong
+        (strong_open)
+        (strong_content
+          (newline))
+        (strong_close)))
+    (newline)))
+
+
+==================
+not strong - words around stars
+==================
+word*word*word
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (word)
+      (star)
+      (word)
+      (star)
+      (word))
+    (newline)))

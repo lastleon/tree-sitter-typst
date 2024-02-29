@@ -1,1 +1,2 @@
 - in strong: \*ha\n\nllo\* is highlighted, but shouldn't be.
+- unicode support

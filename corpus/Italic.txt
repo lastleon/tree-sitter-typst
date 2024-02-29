@@ -1,0 +1,196 @@
+==================
+italic - normal
+==================
+_italic_
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (italic
+        (italic_open)
+        (italic_content
+          (word))
+        (italic_close)))
+    (newline)))
+
+
+==================
+italic - multiple contents
+==================
+_italic *strong* @ref _
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (italic
+        (italic_open)
+        (italic_content
+          (word)
+          (whitespace)
+          (strong
+            (strong_open)
+            (strong_content
+              (word))
+            (strong_close))
+          (whitespace)
+          (reference)
+          (whitespace))
+        (italic_close)))
+    (newline)))
+
+
+==================
+italic - non_word in front
+==================
+$_italic_
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (special)
+      (italic
+        (italic_open)
+        (italic_content
+          (word))
+        (italic_close)))
+    (newline)))
+
+
+==================
+italic - non_word behind front
+==================
+a_$italic_
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (word)
+      (italic
+        (italic_open)
+        (italic_content
+          (special)
+          (word))
+        (italic_close)))
+    (newline)))
+
+
+==================
+italic - non_word behind
+==================
+_italic_$
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (italic
+        (italic_open)
+        (italic_content
+          (word))
+        (italic_close))
+      (special))
+    (newline)))
+
+
+==================
+italic - non_word in front of behind
+==================
+_italic$_a
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (italic
+        (italic_open)
+        (italic_content
+          (word)
+          (special))
+        (italic_close))
+      (word))
+    (newline)))
+
+
+==================
+italic - italic inside
+==================
+_*italic*_
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (italic
+        (italic_open)
+        (italic_content
+          (strong
+            (strong_open)
+            (strong_content
+              (word))
+            (strong_close)))
+        (italic_close)))
+    (newline)))
+
+
+==================
+italic - empty
+==================
+__
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (italic
+        (italic_open)
+        (italic_close)))
+    (newline)))
+
+
+==================
+italic - containing newline
+==================
+_
+_
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (italic
+        (italic_open)
+        (italic_content
+          (newline))
+        (italic_close)))
+    (newline)))
+
+
+==================
+not italic - words around underscores
+==================
+word_word_word
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (word)
+      (underscore)
+      (word)
+      (underscore)
+      (word))
+    (newline)))

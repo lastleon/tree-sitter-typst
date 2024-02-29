@@ -1,0 +1,126 @@
+==================
+reference - only valid chars
+==================
+@abc123-_
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (reference))
+    (newline)))
+
+
+==================
+reference - valid chars with colon
+==================
+@valid:valid
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (reference))
+    (newline)))
+
+
+
+==================
+reference - valid chars with colon following the reference
+==================
+@valid: word
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (reference)
+      (special)
+      (whitespace)
+      (word))
+    (newline)))
+
+
+==================
+reference - after word
+==================
+word@valid:valid
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (word)
+      (reference))
+    (newline)))
+
+
+==================
+reference - valid chars with colon in italic
+==================
+_@valid:valid_ _
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (italic
+        (italic_open)
+        (italic_content
+          (reference)
+          (whitespace))
+        (italic_close)))
+    (newline)))
+
+
+==================
+not reference - invalid chars
+==================
+@$$
+
+---
+
+(markup_block
+  (ERROR)
+  (line
+    (line_content
+      (special))
+    (newline)))
+
+
+==================
+not reference - only colon
+==================
+@: word
+
+---
+
+(markup_block
+  (ERROR)
+  (line
+    (line_content
+      (special)
+      (whitespace)
+      (word))
+    (newline)))
+
+
+==================
+not reference - two colons with valid chars after
+==================
+@::valid
+
+---
+
+(markup_block
+  (ERROR)
+  (line
+    (line_content
+      (special)
+      (word))
+    (newline)))

@@ -1,28 +1,53 @@
 ==================
-Line Comment
+line_comment - normal
 ==================
-
 // This is a comment
-
---
-
-(markup_block
-  (comment
-    (line_comment))) 
-
-
-
-==================
-Block Comment
-==================
-
-/*
-This is a comment
-
-*/
 
 ---
 
 (markup_block
   (comment
-    (block_comment))) 
+    (line_comment))
+  (newline)) 
+
+
+==================
+line_comment - followed by line
+==================
+//comment
+line
+
+---
+
+(markup_block
+  (comment
+    (line_comment))
+  (newline)
+  (line
+    (line_content
+      (word))
+    (newline)))
+
+
+==================
+line_comment - comment in strong
+==================
+*Str//comment
+ong*
+
+---
+
+(markup_block
+  (line
+    (line_content 
+      (strong
+        (strong_open)
+        (strong_content
+          (word)
+          (comment
+            (line_comment))
+          (newline)
+          (word))
+        (strong_close)))
+    (newline)))
+
