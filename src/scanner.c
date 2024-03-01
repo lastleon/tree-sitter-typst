@@ -38,7 +38,10 @@ typedef enum {
   ESCAPE_BACKSLASH,
   UNICODE_ESCAPE,
 
-  ERROR,
+  __ERROR,
+
+  __ERROR_CANARY,
+
 } TokenType;
 
 typedef struct {
@@ -171,7 +174,6 @@ bool parse_raw_delimiters(TSLexer *lexer, const bool *valid_symbols, void *paylo
                         || valid_symbols[RAW_MULTIPLE_OPEN] 
                         || valid_symbols[RAW_MULTIPLE_CLOSE];
 
-  printf("\033[1;31mSCANNER: START PARSING DELIM\033[0m\n");
   if (!raw_valid) {
     return false;
   }
@@ -344,8 +346,11 @@ bool parse_raw_multiple_content(TSLexer *lexer, const bool *valid_symbols, void 
 
         return true;
       }
-      printf("\033[1;31mSCANNER: MULTIPLE_CONTENT END\033[0m\n");
-      return false;
+
+      // Normally, we should return false, but in this special case we need to work around a design limitation of this scanner,
+      // which is why we need to return successfully, but still indicate there was an error. See ADR 004
+      lexer->result_symbol = __ERROR;
+      return true;
     }
 
     // At this point, we have found at least one and less than s->num_backticks_in_open_token backticks, so they are part of the content
@@ -487,7 +492,7 @@ bool tree_sitter_typst_external_scanner_scan(
   TSLexer *lexer,
   const bool *valid_symbols
 ) {
-  if (valid_symbols[ERROR]) {
+  if (valid_symbols[__ERROR_CANARY]) {
     return false;
   }
   

@@ -50,6 +50,9 @@ module.exports = grammar({
     $.linebreak,
     $.escape_backslash,
     $.unicode_escape_internal,
+    
+    // This token can be emitted to indicate an error but still return successfully from the external scanner. 
+    $.__error, 
 
     $.__error_canary // This is never used in the grammar and exists solely to indicate to scanner.c that tree-sitter is in error mode
   ],
@@ -225,10 +228,15 @@ module.exports = grammar({
         ), 
         seq(
           $.raw_multiple_open,
-          // $.raw_single_content, // TODO: Remove this and use the commented code. raw_language_type must also be an external symbol, because if one choice is external the scanner is always called, meaning we can't get higher precedence for raw_language_type if we keep the token in here. Also remember to consider all special cases of raw_multiple_content, such as backtick inside raw_multiple_content.
           choice(
-            seq($.raw_language_type, optional($.raw_multiple_content__language)), // two types of multiple_content tokens are needed because parsing changes slightly based on whether there is a language or not
-            $.raw_multiple_content__no_language, // TODO: maybe alias both types of content tokens if possible?
+            // Two types of multiple_content tokens are needed because parsing changes slightly based on whether there is a language token or not
+            
+            // Error token is needed in order to invoke the external scanner a second time after $.raw_multiple_content__language was not found, 
+            // in order to properly parse $.raw_multiple_close. This is used to work around a design limitation in my scanner. See ADR 004.
+            // TODO: Maybe try to fix this limitation?
+            // TODO: maybe alias both types of content tokens if possible?
+            seq($.raw_language_type, choice($.raw_multiple_content__language, $.__error)), 
+            $.raw_multiple_content__no_language, 
           ),
           $.raw_multiple_close,
         ),

@@ -152,6 +152,23 @@ _`raw`_
         (italic_close)))
     (newline)))
 
+==================
+raw - single - in words
+==================
+word`raw`word
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (word)
+      (raw
+        (raw_single_open)
+        (raw_single_content)
+        (raw_single_close))
+      (word))
+    (newline)))
 
 ==================
 not raw - single - not two empty
@@ -164,6 +181,22 @@ not raw - single - not two empty
   (ERROR
     (raw_multiple_open)
     (raw_multiple_content__no_language)))
+
+
+==================
+not raw - single - escaped backtick
+==================
+\`
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (escaped_character
+        (escape_backslash)))
+    (newline)))
+
 
 ==================
 raw - multiple - only language
@@ -197,11 +230,43 @@ raw - multiple - only content
         (raw_multiple_close)))
     (newline)))
 
+==================
+raw - multiple - only content with other special char in front
+==================
+```/raw```
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (raw
+        (raw_multiple_open)
+        (raw_multiple_content__no_language)
+        (raw_multiple_close)))
+    (newline)))
 
 ==================
 raw - multiple - language and content
 ==================
 ```lang raw```
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (raw
+        (raw_multiple_open)
+        (raw_language_type)
+        (raw_multiple_content__language)
+        (raw_multiple_close)))
+    (newline)))
+
+==================
+raw - multiple - language and content with special char inbetween
+==================
+```lang/raw```
 
 ---
 
@@ -285,6 +350,86 @@ raw - multiple - normal with more backticks
         (raw_language_type)
         (raw_multiple_content__language)
         (raw_multiple_close)))
+    (newline)))
+
+==================
+raw - multiple - in heading
+==================
+== ````lang raw````
+
+---
+
+(markup_block
+  (heading
+    (heading_prefix)
+    (heading_whitespace)
+    (heading_content
+      (raw
+        (raw_multiple_open)
+        (raw_language_type)
+        (raw_multiple_content__language)
+        (raw_multiple_close)))
+    (newline)))
+
+
+==================
+raw - multiple - in bold
+==================
+*``` raw```*
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (strong
+        (strong_open)
+        (strong_content
+          (raw
+            (raw_multiple_open)
+            (raw_multiple_content__no_language)
+            (raw_multiple_close)))
+        (strong_close)))
+    (newline)))
+
+
+
+==================
+raw - multiple - in italic
+==================
+_``` raw```_
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (italic
+        (italic_open)
+        (italic_content
+          (raw
+            (raw_multiple_open)
+            (raw_multiple_content__no_language)
+            (raw_multiple_close)))
+        (italic_close)))
+    (newline)))
+
+==================
+raw - multiple - in words
+==================
+word``` raw```word
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (word)
+      (raw
+        (raw_multiple_open)
+        (raw_multiple_content__no_language)
+        (raw_multiple_close))
+      (word))
     (newline)))
 
 

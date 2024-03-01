@@ -15,3 +15,4 @@
 (reference) @property
 
 (raw) @number
+(raw (raw_language_type) @string)

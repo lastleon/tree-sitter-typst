@@ -962,7 +962,8 @@
                               "name": "raw_multiple_content__language"
                             },
                             {
-                              "type": "BLANK"
+                              "type": "SYMBOL",
+                              "name": "__error"
                             }
                           ]
                         }
@@ -1106,6 +1107,10 @@
     {
       "type": "SYMBOL",
       "name": "unicode_escape_internal"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "__error"
     },
     {
       "type": "SYMBOL",
