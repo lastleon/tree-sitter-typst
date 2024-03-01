@@ -473,7 +473,19 @@
           "named": true
         },
         {
+          "type": "raw_language_type",
+          "named": true
+        },
+        {
           "type": "raw_multiple_close",
+          "named": true
+        },
+        {
+          "type": "raw_multiple_content__language",
+          "named": true
+        },
+        {
+          "type": "raw_multiple_content__no_language",
           "named": true
         },
         {
@@ -775,7 +787,19 @@
     "named": true
   },
   {
+    "type": "raw_language_type",
+    "named": true
+  },
+  {
     "type": "raw_multiple_close",
+    "named": true
+  },
+  {
+    "type": "raw_multiple_content__language",
+    "named": true
+  },
+  {
+    "type": "raw_multiple_content__no_language",
     "named": true
   },
   {

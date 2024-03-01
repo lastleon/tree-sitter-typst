@@ -163,7 +163,7 @@ not raw - single - not two empty
 (markup_block
   (ERROR
     (raw_multiple_open)
-    (raw_multiple_content)))
+    (raw_multiple_content__no_language)))
 
 ==================
 raw - multiple - only language
@@ -193,7 +193,7 @@ raw - multiple - only content
     (line_content
       (raw
         (raw_multiple_open)
-        (raw_multiple_content)
+        (raw_multiple_content__no_language)
         (raw_multiple_close)))
     (newline)))
 
@@ -211,7 +211,7 @@ raw - multiple - language and content
       (raw
         (raw_multiple_open)
         (raw_language_type)
-        (raw_multiple_content)
+        (raw_multiple_content__language)
         (raw_multiple_close)))
     (newline)))
 
@@ -230,7 +230,7 @@ raw - multiple - language and content with special chars
       (raw
         (raw_multiple_open)
         (raw_language_type)
-        (raw_multiple_content)
+        (raw_multiple_content__language)
         (raw_multiple_close)))
     (newline)))
 
@@ -248,10 +248,27 @@ raw - multiple - language and content with backticks inside
       (raw
         (raw_multiple_open)
         (raw_language_type)
-        (raw_multiple_content)
+        (raw_multiple_content__language)
         (raw_multiple_close)))
     (newline)))
 
+
+==================
+raw - multiple - language and content with many backticks inside
+==================
+`````lang```` raw ``` ```` `````
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (raw
+        (raw_multiple_open)
+        (raw_language_type)
+        (raw_multiple_content__language)
+        (raw_multiple_close)))
+    (newline)))
 
 ==================
 raw - multiple - normal with more backticks
@@ -266,7 +283,7 @@ raw - multiple - normal with more backticks
       (raw
         (raw_multiple_open)
         (raw_language_type)
-        (raw_multiple_content)
+        (raw_multiple_content__language)
         (raw_multiple_close)))
     (newline)))
 
@@ -281,11 +298,11 @@ not raw - multiple - not empty
 (markup_block
   (ERROR
     (raw_multiple_open)
-    (raw_multiple_content)))
+    (raw_multiple_content__no_language)))
 
 
 ==================
-not raw - multiple - backtick mismatch
+not raw - multiple - too few backticks
 ==================
 `````lang raw```
 
@@ -295,4 +312,27 @@ not raw - multiple - backtick mismatch
   (ERROR
     (raw_multiple_open)
     (raw_language_type)
-    (raw_multiple_content)))
+    (raw_multiple_content__language)))
+
+
+
+
+==================
+raw - single and multiple - only multiple content followed by single
+==================
+``` raw````a`
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (raw
+        (raw_multiple_open)
+        (raw_multiple_content__no_language)
+        (raw_multiple_close))
+      (raw
+        (raw_single_open)
+        (raw_single_content)
+        (raw_single_close)))
+    (newline)))

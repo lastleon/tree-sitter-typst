@@ -10,7 +10,7 @@ WORD = /(?:[a-zA-Z0-9])+/
 // Reference token
 // A reference name can only contain the chars listed in REF_VALID_NAME, and additionally multiple colons
 // if at least one of the chars in REF_VALID_NAME follows it
-REF_VALID_NAME = "(?:[a-zA-Z0-9\\-_])+"
+REF_VALID_NAME = "(?:[a-zA-Z0-9\\-_])+" // TODO: This also applies to language names in code blocks, i think this is more general
 REFERENCE_NAME_REGEX = new RegExp(`${REF_VALID_NAME}(?::+${REF_VALID_NAME})*`) // TODO: Rename so it is more general and applies to label and reference
 
 
@@ -39,7 +39,8 @@ module.exports = grammar({
 
     $.raw_language_type,
     $.raw_single_content,
-    $.raw_multiple_content,
+    $.raw_multiple_content__language,
+    $.raw_multiple_content__no_language,
 
     // Needed because heading starts are ambiguous
     $.heading_prefix,
@@ -224,11 +225,11 @@ module.exports = grammar({
         ), 
         seq(
           $.raw_multiple_open,
-          $.raw_single_content, // TODO: Remove this and use the commented code. raw_language_type must also be an external symbol, because if one choice is external the scanner is always called, meaning we can't get higher precedence for raw_language_type if we keep the token in here. Also remember to consider all special cases of raw_multiple_content, such as backtick inside raw_multiple_content.
-          // choice(
-          //   seq($.raw_language_type, optional($.raw_multiple_content)),
-          //   $.raw_multiple_content,
-          // ),
+          // $.raw_single_content, // TODO: Remove this and use the commented code. raw_language_type must also be an external symbol, because if one choice is external the scanner is always called, meaning we can't get higher precedence for raw_language_type if we keep the token in here. Also remember to consider all special cases of raw_multiple_content, such as backtick inside raw_multiple_content.
+          choice(
+            seq($.raw_language_type, optional($.raw_multiple_content__language)), // two types of multiple_content tokens are needed because parsing changes slightly based on whether there is a language or not
+            $.raw_multiple_content__no_language, // TODO: maybe alias both types of content tokens if possible?
+          ),
           $.raw_multiple_close,
         ),
       ),

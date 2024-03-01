@@ -1,6 +1,9 @@
+#include <assert.h>
 #include <ctype.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <sys/types.h>
 #include "tree_sitter/parser.h"
 
 typedef enum {
@@ -25,7 +28,8 @@ typedef enum {
 
   RAW_LANGUAGE_TYPE,
   RAW_SINGLE_CONTENT,
-  RAW_MULTIPLE_CONTENT,
+  RAW_MULTIPLE_CONTENT__LANGUAGE,
+  RAW_MULTIPLE_CONTENT__NO_LANGUAGE,
 
   HEADING_PREFIX,
   EQUALSIGNS,
@@ -160,13 +164,14 @@ bool parse_label(TSLexer *lexer, const bool *valid_symbols) {
   return false;
 }
 
-bool parse_raw(TSLexer *lexer, const bool *valid_symbols, void *payload) {
+bool parse_raw_delimiters(TSLexer *lexer, const bool *valid_symbols, void *payload) {
   // This check is probably not needed, as one of these symbols must be valid if (unescaped) backtick is encountered
   const bool raw_valid = valid_symbols[RAW_SINGLE_OPEN] 
                         || valid_symbols[RAW_SINGLE_CLOSE] 
                         || valid_symbols[RAW_MULTIPLE_OPEN] 
                         || valid_symbols[RAW_MULTIPLE_CLOSE];
 
+  printf("\033[1;31mSCANNER: START PARSING DELIM\033[0m\n");
   if (!raw_valid) {
     return false;
   }
@@ -231,18 +236,15 @@ bool parse_raw(TSLexer *lexer, const bool *valid_symbols, void *payload) {
   if (valid_symbols[RAW_MULTIPLE_CLOSE]) {
     lexer->advance(lexer, false);
 
-    // There must be exactly as many backticks as saved in s->num_backticks_in_open_token
+    // We consume exactly as many backticks as was saved in s->num_backticks_in_open_token. Note that there can be more,
+    // but this does not concern us.
+
     for (int num_backticks = 1; num_backticks < s->num_backticks_in_open_token; num_backticks++) {
       if (lexer->eof(lexer) || lexer->lookahead != '`') {
         return false;
       }
 
       lexer->advance(lexer, false);
-    }
-
-    // backtick: too many backticks
-    if (lexer->lookahead == '`') {
-      return false;
     }
 
     s->num_backticks_in_open_token = 0; // I think this is not needed, but better safe than sorry
@@ -263,6 +265,106 @@ bool parse_raw_single_content(TSLexer *lexer, const bool *valid_symbols) {
 
   lexer->result_symbol = RAW_SINGLE_CONTENT;
   return true;
+}
+
+bool raw_is_valid_language_name_char(int32_t c) {
+  return isalnum(c) || c == '-' || c == '_'; // TODO: IMPROVE SUPPORT FOR NON-LATIN CHARACTERS
+}
+
+bool parse_raw_language_name(TSLexer *lexer, const bool *valid_symbols) {
+  do {
+    lexer->advance(lexer, false);
+  } while (!lexer->eof(lexer) && raw_is_valid_language_name_char(lexer->lookahead));
+
+  lexer->result_symbol = RAW_LANGUAGE_TYPE;
+  
+  return true;
+}
+
+bool parse_raw_multiple_content(TSLexer *lexer, const bool *valid_symbols, void *payload, TokenType result_symbol) {
+  Scanner *s = (Scanner *)payload;
+  bool at_least_one_content_char_found = result_symbol == RAW_MULTIPLE_CONTENT__NO_LANGUAGE; // if __NO_LANGUAGE, there must have been at least one char consumed, otherwise not
+  
+  while (true) {
+    // Backtick can be at the start (because either we're in the RAW_MULTIPLE_CONTENT__LANGUAGE case 
+    //  or because we're in the RAW_MULTIPLE_CONTENT__NO_LANGUAGE case and prior work was done 
+    //  or we're in the next loop iteration
+    // At this point, we also know the next token is not EOF.
+    while (!lexer->eof(lexer) && lexer->lookahead != '`') {
+      lexer->advance(lexer, false);
+      at_least_one_content_char_found = true;
+    }
+
+    if (lexer->eof(lexer)) {
+      if (at_least_one_content_char_found) {
+        lexer->mark_end(lexer);
+        lexer->result_symbol = result_symbol;
+        return true;
+      }
+      
+      return false;
+    }
+
+    // If we're here, the next symbol is a backtick. Determine whether it is a RAW_MULTIPLE_CLOSE or possibly multiple backticks inside the content.
+    // Note that there can be (s->num_backticks_in_open_token - 1) backticks before there has to be another char in order for the backticks to be part of the content.
+    assert(lexer->lookahead == '`');
+    assert(s->num_backticks_in_open_token >= 3);
+
+    lexer->mark_end(lexer);
+    lexer->advance(lexer, false);
+    uint32_t num_backticks_found = 1;
+
+    while (!lexer->eof(lexer) && lexer->lookahead == '`') {
+      num_backticks_found++;
+
+      lexer->advance(lexer, false);
+      
+      if (num_backticks_found == (s->num_backticks_in_open_token-1)) {
+        break;
+      }
+    }
+
+    if (lexer->eof(lexer)) { 
+      // If EOF directly after the loop, then the backticks must be part of the content, as there are at most (s->num_backticks_in_open_token - 1)
+      assert(num_backticks_found > 0); // There must be at least one backtick, otherwise the eof case would have been caught before the loop
+
+      lexer->mark_end(lexer);
+      lexer->result_symbol = result_symbol;
+      return true;
+    }
+
+    if (lexer->lookahead == '`') {
+      // If next char is backtick, we reached the end of the loop, i.e. we found as many backticks as possible and there are still more,
+      // so these backticks must be part of RAW_MULTIPLE_CLOSE
+      assert(num_backticks_found == (s->num_backticks_in_open_token - 1));
+
+      if (at_least_one_content_char_found) {
+        // Note we explicitly DO NO MARK_END here, as we don't want to consume the found backticks
+        lexer->result_symbol = result_symbol;
+
+        return true;
+      }
+      printf("\033[1;31mSCANNER: MULTIPLE_CONTENT END\033[0m\n");
+      return false;
+    }
+
+    // At this point, we have found at least one and less than s->num_backticks_in_open_token backticks, so they are part of the content
+    // We also know the next char is not a backtick
+    assert(lexer->lookahead != '`');
+
+    at_least_one_content_char_found = true;
+    lexer->advance(lexer, false);
+    lexer->mark_end(lexer);
+    
+    if (lexer->eof(lexer)) {
+      // Here we don't need to check at_least_one_conten_char_found, as we know we found one already
+      lexer->result_symbol = result_symbol;
+
+      return true;
+    }
+
+    // Now we know the next char is not EOF and the next char can be a backtick, the same situation as in the beginning of the loop
+  }
 }
 
 bool parse_escape(TSLexer *lexer, const bool *valid_symbols) {
@@ -398,6 +500,33 @@ bool tree_sitter_typst_external_scanner_scan(
     return parse_raw_single_content(lexer, valid_symbols);
   }
 
+  if (valid_symbols[RAW_LANGUAGE_TYPE] && raw_is_valid_language_name_char(lexer->lookahead)) { // First check if language string exists and possibly parse it
+    return parse_raw_language_name(lexer, valid_symbols);
+  }
+
+  if (valid_symbols[RAW_MULTIPLE_CONTENT__NO_LANGUAGE]) {
+    // After NO_LANGUAGE, there must be some non language_name_char and not a backtick. A language_name_char would result in a RAW_LANGUAGE_TYPE token and then 
+    // a RAW_MULTIPLE_CONTENT__LANGUAGE token, so not posssible. A backtick cannot be there because all backticks would be consumed by RAW_MULTIPLE_OPEN.
+    // TODO: Think about whether I want to keep this check in. It should not be possible.
+    if (raw_is_valid_language_name_char(lexer->lookahead) || lexer->lookahead == '`') {
+      printf("\033[1;31mSCANNER: REACHED IMPOSSIBLE STATE\033[0m\n");
+      return false;
+    }
+    lexer->advance(lexer, false);
+
+    if (lexer->eof(lexer)) {
+      lexer->result_symbol = RAW_MULTIPLE_CONTENT__NO_LANGUAGE;
+      return true;
+    }
+
+    return parse_raw_multiple_content(lexer, valid_symbols, payload, RAW_MULTIPLE_CONTENT__NO_LANGUAGE);
+  }
+
+  if (valid_symbols[RAW_MULTIPLE_CONTENT__LANGUAGE]) {
+    return parse_raw_multiple_content(lexer, valid_symbols, payload, RAW_MULTIPLE_CONTENT__LANGUAGE);
+  }
+  // end special case
+
   switch (lexer->lookahead) {
     case '=':
     if (valid_symbols[HEADING_PREFIX] && valid_symbols[EQUALSIGNS]) {
@@ -428,7 +557,7 @@ bool tree_sitter_typst_external_scanner_scan(
     return parse_label(lexer, valid_symbols);
 
     case '`':
-    return parse_raw(lexer, valid_symbols, payload);
+    return parse_raw_delimiters(lexer, valid_symbols, payload);
 
     case '\\':
     return parse_escape(lexer, valid_symbols);
