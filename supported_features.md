@@ -16,7 +16,12 @@
         - **TODO**:
             - Non-latin letter support
     - [x] Testing implemented
-- [ ] Raw text
+- [~] Raw text
+    - [ ] Support
+        - [x] Basic
+        - [ ] Full
+        - **TODO**:
+            - Non-latin letter support in language type
 - [ ] Link (Probably won't support)
 - [~] Label
     - [ ] Support
@@ -47,7 +52,10 @@
 - [x] Smart quotes
 - [ ] Symbol shorthand
 - [ ] Code expression
-- [ ] Character escape
+- [x] Character escape
+- [~] Unicode escape
+    - Basic support, could be better
+    - TODO: Write down what's left
 - [x] Line Comment
     - [x] Support
     - [x] Testing implemented

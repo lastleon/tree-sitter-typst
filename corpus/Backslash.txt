@@ -90,6 +90,35 @@ backslash - escaped character - normal word char
 
 
 ==================
+backslash - escaped character - exotic word char
+==================
+\ä
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (escaped_character
+        (escape_backslash)))
+    (newline)))
+
+
+==================
+backslash - escaped character - more exotic word char
+==================
+\字
+
+---
+
+(markup_block
+  (line
+    (line_content
+      (escaped_character
+        (escape_backslash)))
+    (newline)))
+
+==================
 backslash - escaped character - normal non word char
 ==================
 \(
